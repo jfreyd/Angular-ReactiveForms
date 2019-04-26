@@ -35,6 +35,12 @@ function ratingRange(min: number, max: number) : ValidatorFn {
 export class CustomerComponent implements OnInit {
   customerForm: FormGroup;
   customer = new Customer();
+  emailMessage: string;
+
+  private validationMessages = {
+    required: 'Please enter your email address',
+    email:  'Please enter a valid email address'
+  };
 
   constructor(private fb: FormBuilder) { 
 
@@ -46,7 +52,7 @@ export class CustomerComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(3)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
       emailGroup: this.fb.group({
-        email: ['', Validators.required, Validators.email], 
+        email: ['', [Validators.required, Validators.email]], 
         confirmEmail:['', Validators.required],  
       }, {validator: emailMatcher} ),
       phone: '',
@@ -56,9 +62,13 @@ export class CustomerComponent implements OnInit {
     });
 
     this.customerForm.get('notification').valueChanges.subscribe(
-      value => console.log(value)
+      value => this.setNotification(value)
      );
-    
+
+     const emailControl = this.customerForm.get('emailGroup.email');
+      emailControl.valueChanges.subscribe(
+        value => this.setMessage(emailControl)
+      );
   }
 
   populateTestData() {
@@ -73,6 +83,16 @@ export class CustomerComponent implements OnInit {
     console.log('Saved: ' + JSON.stringify(this.customerForm.value));
   }
 
+  setMessage(c: AbstractControl): void {
+    console.log("Entering setMessage");
+    this.emailMessage = '';
+    if((c.touched || c.dirty) && c.errors) {
+      this.emailMessage = Object.keys(c.errors).map(
+        key => this.validationMessages[key]).join(' ');
+      console.log(this.emailMessage);
+    }
+  }
+
   setNotification(notifyVia: string): void {
     const phoneControl = this.customerForm.get('phone');
     console.log("notifyVia: " + notifyVia);
@@ -85,4 +105,5 @@ export class CustomerComponent implements OnInit {
     }
     phoneControl.updateValueAndValidity();
   }
+
 }
