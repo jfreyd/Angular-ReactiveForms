@@ -54,6 +54,11 @@ export class CustomerComponent implements OnInit {
       rating: [null, ratingRange(1, 5) ],
       sendCatalog: true
     });
+
+    this.customerForm.get('notification').valueChanges.subscribe(
+      value => console.log(value)
+     );
+    
   }
 
   populateTestData() {
@@ -73,9 +78,9 @@ export class CustomerComponent implements OnInit {
     console.log("notifyVia: " + notifyVia);
     if(notifyVia === 'text') {
       phoneControl.setValidators(Validators.required);
-      console.log("text");
+//      console.log("text");
     } else {
-      console.log("Not text or email");
+//     console.log("Not text or email");
       phoneControl.clearValidators();
     }
     phoneControl.updateValueAndValidity();
